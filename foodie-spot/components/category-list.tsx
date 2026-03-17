@@ -1,5 +1,8 @@
+import React from 'react';
 import { Coffee, IceCream2, Pizza, Sandwich, UtensilsCrossed } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/contexts/theme-context';
+import { useI18n } from '@/hooks/use-i18n';
 
 const categories = [
     { label: 'Burger', icon: <Sandwich size={18} color="#FF6B35" /> },
@@ -10,14 +13,17 @@ const categories = [
 ];
 
 export const CategoryList: React.FC = () => {
+    const { colors } = useTheme();
+    const { t } = useI18n();
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Catégories</Text>
+            <Text style={[styles.title, { color: colors.text }]}>{t('home.categories')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {categories.map((category) => (
-                    <TouchableOpacity key={category.label} style={styles.chip}>
-                        {category.icon}
-                        <Text style={styles.chipText}>{category.label}</Text>
+                    <TouchableOpacity key={category.label} style={[styles.chip, { backgroundColor: colors.tint + '15' }]}>
+                        {React.cloneElement(category.icon as React.ReactElement, { color: colors.tint})}
+                        <Text style={[styles.chipText, { color: colors.tint }]}>{category.label}</Text>
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -39,7 +45,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#FFF4EF',
         paddingHorizontal: 14,
         paddingVertical: 10,
         borderRadius: 18,
