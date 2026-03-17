@@ -16,15 +16,18 @@ export default function LoginScreen() {
   const [localError, setLocalError] = useState('');
 
   const handleLogin = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) { setLocalError('Veuillez entrer votre email'); return; }
-    if (!email.includes('@')) { setLocalError('Email invalide'); return; }
+    if (!emailRegex.test(email.trim())) { setLocalError('Format d\'email invalide'); return; }
     if (!password) { setLocalError('Veuillez entrer votre mot de passe'); return; }
 
     setLocalError('');
     try {
-      await login({ email: email.trim(), password });
-    } catch (err) {
-      console.log('Login error handled');
+      await login({ email: email.trim().toLowerCase(), password });
+      router.replace('/(tabs)');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Identifiants incorrects';
+      setLocalError(msg);
     }
   };
 
@@ -70,11 +73,11 @@ export default function LoginScreen() {
           </View>
 
           <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/(auth)/register')} disabled={isLoading}>
-            <Text style={styles.registerText}>Pas encore de compte ? <Text style={styles.registerTextBold}>S'inscrire</Text></Text>
+            <Text style={styles.registerText}>Pas encore de compte ? <Text style={styles.registerTextBold}>S&apos;inscrire</Text></Text>
           </TouchableOpacity>
 
           <View style={styles.demoHint}>
-            <Text style={styles.demoHintText}>💡 Pour tester, utilisez n'importe quel email/mot de passe</Text>
+            <Text style={styles.demoHintText}>💡 Pour tester, utilisez n&apos;importe quel email/mot de passe</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
