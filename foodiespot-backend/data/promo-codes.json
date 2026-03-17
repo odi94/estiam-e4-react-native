@@ -1,0 +1,16 @@
+[
+  {
+    "id": "promo1",
+    "code": "FOODIE30",
+    "discount": 0.30,
+    "message": "Code appliqué ! -30% sur la commande",
+    "active": true
+  },
+  {
+    "id": "promo2",
+    "code": "BIENVENUE10",
+    "discount": 0.10,
+    "message": "Code appliqué ! -10% de bienvenue",
+    "active": true
+  }
+]

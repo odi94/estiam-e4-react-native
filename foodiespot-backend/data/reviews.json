@@ -1,0 +1,63 @@
+[
+  {
+    "id": "rev1",
+    "userId": "u1",
+    "userName": "Jean Dupont",
+    "restaurantId": "r1",
+    "rating": 5,
+    "foodRating": 5,
+    "deliveryRating": 4,
+    "serviceRating": 5,
+    "comment": "Excellente nourriture, très bien emballé !",
+    "images": [
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400"
+    ],
+    "createdAt": "2024-03-10T12:00:00Z"
+  },
+  {
+    "id": "rev2",
+    "userId": "u2",
+    "userName": "Marie Curie",
+    "restaurantId": "r1",
+    "rating": 4,
+    "foodRating": 4,
+    "deliveryRating": 5,
+    "serviceRating": 3,
+    "comment": "Très bon mais un peu lent.",
+    "createdAt": "2024-03-12T14:30:00Z"
+  },
+  {
+    "id": "c7dff883-dd66-4272-807e-a53ad1f327f4",
+    "userId": "e9f58eb9-b95b-4a02-9ef8-76c1cbf64b42",
+    "userName": "superabel000 Demo",
+    "userAvatar": "",
+    "restaurantId": "r1",
+    "orderId": "9cc936c9-a92d-4b80-98b1-a4e742c2bf33",
+    "rating": 2,
+    "qualityRating": 2,
+    "speedRating": 3,
+    "presentationRating": 4,
+    "comment": "Test",
+    "images": [],
+    "likes": 0,
+    "isVerifiedPurchase": true,
+    "createdAt": "2026-03-17T13:21:27.058Z"
+  },
+  {
+    "id": "f753976c-9db5-44ca-9bfd-a51e3e89e20b",
+    "userId": "e9f58eb9-b95b-4a02-9ef8-76c1cbf64b42",
+    "userName": "superabel000 Demo",
+    "userAvatar": "",
+    "restaurantId": "r1",
+    "orderId": "19e1bed8-1714-4357-af2e-4c1bbb2c5180",
+    "rating": 3,
+    "qualityRating": 3,
+    "speedRating": 4,
+    "presentationRating": 5,
+    "comment": "Bon",
+    "images": [],
+    "likes": 0,
+    "isVerifiedPurchase": true,
+    "createdAt": "2026-03-17T13:22:58.667Z"
+  }
+]

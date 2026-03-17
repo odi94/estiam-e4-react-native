@@ -1,0 +1,145 @@
+{
+  "home": {
+    "promoLabel": "Special offer",
+    "promoCode": "Code",
+    "locationLabel": "Deliver to",
+    "searchPlaceholder": "Search for a restaurant...",
+    "categories": "Categories",
+    "nearby": "Nearby",
+    "empty": "No restaurants found"
+  },
+  "search": {
+    "placeholder": "Search for a restaurant",
+    "results": "found",
+    "empty": "No restaurants found"
+  },
+  "orders": {
+    "title": "My Orders",
+    "empty": "No orders found.",
+    "filters": {
+      "all": "All",
+      "ongoing": "Ongoing",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    }
+  },
+  "profile": {
+    "orders": "Orders",
+    "favorites": "Favorites",
+    "reviews": "Reviews",
+    "addresses": "My addresses",
+    "history": "History",
+    "theme": "Theme",
+    "language": "Language",
+    "share": "Share the app",
+    "divers": "Divers",
+    "support": "Support",
+    "logout": "Logout"
+  },
+  "cart": {
+    "title": "My Cart",
+    "empty": "Your cart is empty",
+    "empty_title": "Empty Cart",
+    "empty_message": "Please add items before checking out.",
+    "browse_restaurants": "Browse restaurants",
+    "clear": "Clear",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery fee",
+    "service": "Service fee",
+    "total": "Total",
+    "checkout": "Checkout"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "address": "Delivery address",
+    "add_address": "Add an address",
+    "address_soon": "Address selection will be available soon. Using default address.",
+    "address_required": "Please add an address in your profile to continue.",
+    "select_address_error": "Please select a delivery address.",
+    "payment": "Payment method",
+    "payment_method": "Credit Card",
+    "promo_code": "Promo Code",
+    "add_promo": "Enter code (e.g. FOODIE30)",
+    "apply": "Apply",
+    "promo_invalid": "Invalid code",
+    "promo_error": "Validation error",
+    "summary": "Summary",
+    "articles": "Articles",
+    "discount": "Discount",
+    "total": "Total",
+    "placeOrder": "Place Order",
+    "success_title": "Order successful!",
+    "success_msg": "Your order has been placed successfully.",
+    "track_order": "Track Order",
+    "processing": "Processing...",
+    "error": "Could not place order."
+  },
+  "restaurant": {
+    "popular": "Popular",
+    "info": "Info",
+    "rating": "Rating",
+    "deliveryTime": "min",
+    "error_loading": "Failed to load restaurant details.",
+    "loading": "Loading restaurant...",
+    "directions": "Directions",
+    "call": "Call",
+    "no_phone": "This restaurant has no phone number.",
+    "menu": "Menu",
+    "reviews": "Reviews",
+    "no_reviews": "No reviews yet",
+    "share_msg": "Check out this restaurant on FoodieSpot"
+  },
+  "dish": {
+    "addToCart": "Add to Cart",
+    "added_to_cart": "add to cart"
+  },
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "information": "Information",
+    "address_missing": "Missing Address",
+    "loading": "Loading...",
+    "offline": "Offline",
+    "back": "Back",
+    "retry": "Retry"
+  },
+  "review": {
+    "title": "Leave a review",
+    "comment": "Comment",
+    "submit": "Submit"
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "empty": "No favorite restaurants"
+  },
+  "tracking": {
+    "title": "Order Tracking",
+    "arrival": "Estimated arrival",
+    "calculating": "Calculating...",
+    "driver_call": "Call driver",
+    "steps_title": "Preparation Steps",
+    "address_title": "Delivery Address",
+    "loading": "Loading tracking...",
+    "unavailable": "Tracking unavailable",
+    "back": "Back",
+    "delivered_success": "Order delivered successfully!",
+    "return_home": "Return to Home"
+  },
+  "onboarding": {
+    "slide1": {
+      "title": "Order your favorite food",
+      "desc": "Hundreds of restaurants at your fingertips. Find your favorite meals in seconds."
+    },
+    "slide2": {
+      "title": "Ultra-fast delivery",
+      "desc": "Track your order in real time. Our drivers bring your hot meal in record time."
+    },
+    "slide3": {
+      "title": "Simple & secure payment",
+      "desc": "Pay confidently with your favorite payment methods. Enjoy exclusive offers!"
+    },
+    "skip": "Skip",
+    "start": "Get Started",
+    "next": "Next"
+  }
+}

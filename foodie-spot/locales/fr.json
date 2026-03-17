@@ -1,0 +1,155 @@
+{
+  "home": {
+    "promoLabel": "Offre spéciale",
+    "promoCode": "Code",
+    "locationLabel": "Livraison à",
+    "searchPlaceholder": "Rechercher un restaurant...",
+    "categories": "Catégories",
+    "nearby": "À proximité",
+    "empty": "Aucun restaurant trouvé"
+  },
+  "search": {
+    "placeholder": "Rechercher un restaurant",
+    "results": "trouvés",
+    "empty": "Aucun restaurant trouvé"
+  },
+  "orders": {
+    "title": "Mes Commandes",
+    "empty": "Aucune commande trouvée.",
+    "filters": {
+      "all": "Toutes",
+      "ongoing": "En cours",
+      "delivered": "Livrées",
+      "cancelled": "Annulées"
+    }
+  },
+  "profile": {
+    "orders": "Commandes",
+    "favorites": "Favoris",
+    "reviews": "Avis",
+    "addresses": "Mes adresses",
+    "history": "Historique",
+    "theme": "Thème",
+    "language": "Langue",
+    "share": "Partager l'app",
+    "divers": "Divers",
+    "support": "Support",
+    "logout": "Déconnexion"
+  },
+  "cart": {
+    "title": "Mon Panier",
+    "empty": "Votre panier est vide",
+    "empty_title": "Panier vide",
+    "empty_message": "Veuillez ajouter des articles avant de commander.",
+    "browse_restaurants": "Parcourir les restaurants",
+    "clear": "Vider",
+    "subtotal": "Sous-total",
+    "delivery": "Frais de livraison",
+    "service": "Frais de service",
+    "total": "Total",
+    "checkout": "Commander"
+  },
+  "checkout": {
+    "title": "Validation",
+    "address": "Adresse de livraison",
+    "add_address": "Ajouter une adresse",
+    "address_soon": "La sélection d'adresse sera bientôt disponible. Utilisation de l'adresse par défaut.",
+    "address_required": "Veuillez ajouter une adresse dans votre profil pour continuer.",
+    "select_address_error": "Veuillez sélectionner une adresse de livraison.",
+    "payment": "Moyen de paiement",
+    "payment_method": "Carte bancaire",
+    "promo_code": "Code Promo",
+    "add_promo": "Entrer le code (ex: FOODIE30)",
+    "apply": "Appliquer",
+    "promo_invalid": "Code invalide",
+    "promo_error": "Erreur de validation",
+    "summary": "Résumé",
+    "articles": "Articles",
+    "discount": "Remise",
+    "total": "Total",
+    "placeOrder": "Confirmer la commande",
+    "success_title": "Commande réussie !",
+    "success_msg": "Votre commande a été enregistrée avec succès.",
+    "track_order": "Suivre la commande",
+    "processing": "Traitement...",
+    "error": "Impossible de passer la commande."
+  },
+  "restaurant": {
+    "popular": "Populaire",
+    "info": "Infos",
+    "rating": "Note",
+    "deliveryTime": "min",
+    "error_loading": "Impossible de charger les détails du restaurant.",
+    "loading": "Chargement du restaurant...",
+    "directions": "Itinéraire",
+    "call": "Appeler",
+    "no_phone": "Ce restaurant n'a pas de numéro de téléphone.",
+    "menu": "Menu",
+    "reviews": "Avis",
+    "no_reviews": "Aucun avis pour l'instant.",
+    "share_msg": "Regarde ce restaurant sur FoodieSpot"
+  },
+  "dish": {
+    "addToCart": "Ajouter au panier",
+    "added_to_cart": "Ajouter au panier"
+  },
+  "common": {
+    "success": "Succès",
+    "error": "Erreur",
+    "information": "Information",
+    "address_missing": "Adresse Manquante",
+    "loading": "Chargement...",
+    "offline": "Hors ligne",
+    "back": "Retour",
+    "retry": "Réessayer"
+  },
+  "review": {
+    "title": "Laisser un avis",
+    "question": "Comment était votre commande ?",
+    "subquestion": "Notez votre expérience globale",
+    "comment_label": "Votre commentaire (optionnel)",
+    "placeholder": "Racontez-nous votre expérience...",
+    "add_photo": "Ajouter une photo",
+    "submit": "Publier mon avis",
+    "rating_required": "Note requise",
+    "rating_required_msg": "Veuillez donner une note entre 1 et 5 étoiles.",
+    "success": "Merci !",
+    "success_msg": "Votre avis a été publié avec succès.",
+    "back_to_orders": "Retour aux commandes",
+    "error": "Impossible de publier l'avis."
+  },
+  "favorites": {
+    "title": "Mes Favoris",
+    "empty": "Aucun restaurant favori"
+  },
+  "tracking": {
+    "title": "Suivi de commande",
+    "arrival": "Arrivée prévue",
+    "calculating": "Calcul en cours...",
+    "driver_call": "Appeler le livreur",
+    "steps_title": "Étapes de préparation",
+    "address_title": "Adresse de livraison",
+    "loading": "Chargement du suivi...",
+    "unavailable": "Suivi indisponible",
+    "back": "Retour",
+    "delivered_success": "Commande livrée avec succès !",
+    "return_home": "Retourner à l'accueil"
+  },
+  "onboarding": {
+    "slide1": {
+      "title": "Commandez vos plats préférés",
+      "desc": "Des centaines de restaurants à portée de main. Trouvez vos plats préférés en quelques secondes."
+    },
+    "slide2": {
+      "title": "Livraison ultra-rapide",
+      "desc": "Suivez votre commande en temps réel. Nos livreurs vous apportent votre repas chaud en un temps record."
+    },
+    "slide3": {
+      "title": "Paiement simple & sécurisé",
+      "desc": "Payez en toute confiance avec vos moyens de paiement préférés. Profitez d'offres exclusives !"
+    },
+    "skip": "Passer",
+    "start": "Commencer",
+    "next": "Suivant"
+  }
+}
