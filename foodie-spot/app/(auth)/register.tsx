@@ -19,16 +19,17 @@ export default function RegisterScreen() {
   const [localError, setLocalError] = useState('');
 
   const handleRegister = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!firstName.trim()) { setLocalError('Veuillez entrer votre prénom'); return; }
     if (!lastName.trim()) { setLocalError('Veuillez entrer votre nom'); return; }
-    if (!email.includes('@')) { setLocalError('Email invalide'); return; }
+    if (!emailRegex.test(email.trim())) { setLocalError('Format d\'email invalide'); return; }
     if (password.length < 6) { setLocalError('Mot de passe trop court (min 6)'); return; }
     if (password !== confirmPassword) { setLocalError('Mots de passe différents'); return; }
 
     setLocalError('');
     try {
-      await register({ email: email.trim(), password, firstName: firstName.trim(), lastName: lastName.trim(), phone: phone.trim() });
-    } catch (err) {
+      await register({ email: email.trim().toLowerCase(), password, firstName: firstName.trim(), lastName: lastName.trim(), phone: phone.trim() });
+    } catch {
       console.log('Register error handled');
     }
   };
