@@ -1,33 +1,48 @@
-import { MapPin, Search } from 'lucide-react-native';
-import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MapPin, Search, ShoppingCart } from 'lucide-react-native';
+import { ActivityIndicator, Alert, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CategoryList } from '@/components/category-list';
 import { RestaurantCard } from '@/components/restaurant-card';
-import { restaurantAPI } from '@/services/api';
+import { useCart } from "@/contexts/cart-context";
+import { restaurantAPI, promoAPI } from '@/services/api';
 import { locationService } from '@/services/location';
 import { Restaurant } from '@/types';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useI18n } from "@/hooks/use-i18n";
+import { useTheme } from '@/contexts/theme-context';
+
 
 export default function HomeScreen() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [location, setLocation] = useState<string>('Locating...');
+  const [promo, setPromo] = useState<any>(null);
+  const { t } = useI18n();
+  const { colors } = useTheme();
 
   useEffect(() => {
     // Fetch restaurants data
     loadData();
     getCurrentLocation();
+    loadPromo();
   }, []);
+
+  const loadPromo = async () => {
+    const data = await promoAPI.getPromoBanner();
+    setPromo(data);
+  };
 
   const loadData = async () => {
     try {
-      const data = await restaurantAPI.getRestaurants();
+      const coords = await locationService.getCurrentLocation();
+      const filters = coords ? { lat: coords.latitude, lng: coords.longitude } : {};
+      const data = await restaurantAPI.getRestaurants(filters);
       setRestaurants(data);
     } catch (error) {
-      // log.error("Failed to load restaurants", error);
+      console.error("Failed to load restaurants", error);
       Alert.alert("Error", "Failed to load restaurants");
     }
     finally {
@@ -52,43 +67,74 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
+  const { totalItems } = useCart();
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.locationContainer}>
-          <MapPin size={20} color="#fff" />
-          <View style= {{ flex: 1}}>
-            <Text style={styles.locationLabel}>Livraison à </Text>
-            <Text style={styles.locationText} numberOfLines={1}>{location}</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.tint }]}>
+        <View style={styles.topRow}>
+          <View style={styles.locationContainer}>
+            <MapPin size={20} color="#fff" />
+            <View style= {{ flex: 1}}>
+              <Text style={styles.locationLabel}>{t('home.locationLabel')} </Text>
+              <Text style={styles.locationText} numberOfLines={1}>{location}</Text>
+            </View>
           </View>
+
+          <TouchableOpacity style={styles.cartButton} onPress={() => router.push('/cart')}>
+              <ShoppingCart size={24} color="#fff" />
+              {totalItems > 0 && (
+                  <View style={styles.cartBadge}>
+                      <Text style={styles.cartBadgeText}>{totalItems}</Text>
+                  </View>
+              )}
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.searchBar} onPress={() => router.push('/(tabs)/search')}>
-        <Search size={20} color="#666" />
-        <Text style={styles.searchPlaceholder}>Rechercher un restaurant...</Text>
+        <TouchableOpacity 
+          style={[styles.searchBar, { backgroundColor: colors.background }]} 
+          onPress={() => router.push('/(tabs)/search')}
+        >
+          <Search size={20} color={colors.gray} />
+          <Text style={[styles.searchPlaceholder, { color: colors.gray }]}>{t('home.searchPlaceholder')}</Text>
         </TouchableOpacity>
       </View>
 
 
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-         <View style={styles.promoBanner}>
-          <Text style={styles.promoLabel}>Offre spéciale</Text>
-          <Text style={styles.promoTitle}>-30% sur votre première commande</Text>
-          <Text style={styles.promoCode}>Code: FOODIE30</Text>
-         </View>
-
-          <CategoryList />
-
-          <View style={styles.section}>
-              <Text style={styles.sectionTitle}> A proximité</Text>
-              {restaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} onPress={() => router.push(`/restaurant/${restaurant.id}`)} />
-              ))}
-              {!loading && restaurants.length === 0 && <Text style={styles.emptyText}>Aucun restaurant trouvé</Text>}
-              {/* {loading && <Text>Chargement des restaurants...</Text>} */}
-          </View>
-         
-      </ScrollView>
+      <FlatList
+        data={restaurants}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }: { item: Restaurant }) => (
+          <RestaurantCard restaurant={item} onPress={() => router.push(`/restaurant/${item.id}`)} />
+        )}
+        showsVerticalScrollIndicator={false}
+        style={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListHeaderComponent={
+          <>
+            {promo && (
+              <View style={[styles.promoBanner, { backgroundColor: promo.color }]}>
+                <Text style={styles.promoLabel}>{t('home.promoLabel')}</Text>
+                <Text style={styles.promoTitle}>{promo.title}</Text>
+                <Text style={styles.promoCode}>{t('home.promoCode')} : {promo.code}</Text>
+              </View>
+            )}
+            <CategoryList />
+            <Text style={[styles.sectionTitle, { color: colors.text, paddingHorizontal: 16 }]}> {t('home.nearby')}</Text>
+          </>
+        }
+        ListFooterComponent={
+          !loading && restaurants.length === 0 ? (
+            <Text style={styles.emptyText}>{t('home.empty')}</Text>
+          ) : null
+        }
+        ListEmptyComponent={
+          loading ? (
+            <ActivityIndicator size="large" color="#FF6B35" style={{ marginVertical: 20 }} />
+          ) : null
+        }
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />
     
     </SafeAreaView>
   );
@@ -105,11 +151,17 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 20,
   },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
   locationContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 16,
   },
   locationLabel: {
     fontSize: 12,
@@ -119,6 +171,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
+  },
+  cartButton: {
+    padding: 8,
+    backgroundColor: '#FF6B35',
+    borderRadius: 20,
+    marginLeft: 12,
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#fff',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+  },
+  cartBadgeText: {
+    color: '#FF6B35',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   searchBar: {
     flexDirection: 'row',
@@ -132,7 +208,6 @@ const styles = StyleSheet.create({
   searchPlaceholder: {
     flex: 1,
     fontSize: 14,
-    color: 'rgba(0, 0, 0, 0.5)',
   },
   content : {
     flex: 1,
