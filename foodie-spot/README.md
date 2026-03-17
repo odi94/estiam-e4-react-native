@@ -1,50 +1,47 @@
-# Welcome to your Expo app 👋
+# FoodieSpot - Estiam E4
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Application FoodieSpot (React Native + Backend Node.js).
 
-## Get started
+## Décisions Techniques
 
-1. Install dependencies
+- **Architecture :** Séparation des responsabilités (UI dans `app/` et `components/`, logique métier dans `hooks/`, appels réseaux dans `services/`).
+- **Gestion d'État :** Utilisation de Contexts React (ex: `CartContext`, `ThemeContext`) privilégiée pour éviter le prop-drilling, couplée au stockage local (`AsyncStorage` / `SecureStore`) pour la persistance hors-ligne.
+- **Réseau & API :** Centralisation des requêtes via Axios avec intercepteurs pour la gestion automatique du token d'authentification.
+- **Performances UI :** Remplacement des `ScrollView` par `FlatList` (ex: Category List) pour des listes performantes.
 
-   ```bash
-   npm install
-   ```
+## Fonctionnalités Innovantes (Choix & Justifications)
 
-2. Start the app
+1. **Mode Sombre (Dark Mode)**
 
-   ```bash
-   npx expo start
-   ```
+   - **Pourquoi ?** Réduit la fatigue oculaire et s'adapte aux préférences système de l'utilisateur.
+   - **Valeur utilisateur :** Améliore grandement le confort d'utilisation nocturne ou en faible luminosité.
+   - **Difficultés :** Nécessite une abstraction rigoureuse des couleurs (via `Colors` et `useTheme()`) pour ne pas avoir de valeurs hexadécimales en dur.
+2. **Système de Panier Interactif**
 
-In the output, you'll find options to open the app in a
+   - **Pourquoi ?** Centralise la gestion des commandes depuis n'importe quel écran.
+   - **Valeur utilisateur :** Indicateur flottant omniprésent rappelant le contenu et le total courant, facilitant le passage en caisse.
+   - **Difficultés :** Assurer la réactivité globale via le `CartContext` sans provoquer des re-renders inutiles sur l'ensemble de l'application.
+3. **Suivi de Livraison en Temps Réel sur Carte**
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   - **Pourquoi ?** Comble le manque de visibilité de l'utilisateur après le paiement.
+   - **Valeur utilisateur :** Rassure l'utilisateur et rend l'expérience d'attente ludique en visualisant la position du livreur et l'adresse d'arrivée.
+   - **Difficultés :** Intégration de `react-native-maps` et maintien d'une expérience fluide via un intervalle de synchronisation (polling) vers l'API.
+4. **Système d'Avis avec Critères Multiples**
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   - **Pourquoi ?** Offrir une mesure de qualité détaillée pour les restaurants, bien plus précise qu'une simple note sur 5.
+   - **Valeur utilisateur :** Permet aux futurs clients d'avoir des retours ciblés (qualité, vitesse livraison).
+   - **Difficultés :** Gérer plusieurs états de formulaire complexes et l'envoi vers un endpoint REST adapté.
+5. **Estimation du Temps et du Coût de Livraison**
 
-## Get a fresh project
+   - **Pourquoi ?** Apporte de la transparence avant même l'ajout d'articles au panier.
+   - **Valeur utilisateur :** Évite la surprise des frais cachés ou de délais trop longs à la toute dernière étape de paiement.
+   - **Difficultés :** Lier les coordonnées GPS du téléphone, l'adresse du restaurant, et recalculer la distance et les coûts de manière dynamique et réactive.
 
-When you're ready, run:
+6. **Système d'Onboarding Dynamique et Persistant**
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   - **Pourquoi ?** Présenter les fonctionnalités clés de l'application aux nouveaux utilisateurs lors de leur première connexion.
+   - **Valeur utilisateur :** Accompagne l'utilisateur pour une meilleure compréhension de la plateforme (commande, livraison, options).
+   - **Difficultés :**
+     - Gestion asynchrone de l'état d'affichage (via `AsyncStorage` avec la clé `onboarding_seen`) pour s'assurer que l'écran ne s'affiche qu'une seule fois.
+     - Synchronisation parfaite avec la logique de routing et le `NavigationGuard` (Expo Router) afin d'éviter les conflits de redirection entre la racine (`/`), l'onboarding et l'authentification (`/login`).
+     - Utilisation de `FlatList` et d'animations pour créer un carrousel paginé fluide avec un indicateur visuel de progression.
