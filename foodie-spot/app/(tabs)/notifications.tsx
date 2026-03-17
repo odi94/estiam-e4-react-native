@@ -1,6 +1,6 @@
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {useRouter} from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import * as Device from 'expo-device';
 import { useNotifications } from '@/hooks/use-notifications';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +12,14 @@ export default function NotificationScreen() {
     const [testResults, setTestResults] = useState<string[]>([]);
     const isSimulator = !Device.isDevice;
 
+    const onReceived = useCallback((notification: any) => {
+        addTestResult(`✅ Notification reçue: ${notification.request.content.title}`);
+    }, []);
+
+    const onTapped = useCallback((data: any) => {
+        addTestResult(`👆 Notification cliquée: ${JSON.stringify(data)}`);
+    }, []);
+
     const {
         pushToken,
         isLoading,
@@ -19,19 +27,12 @@ export default function NotificationScreen() {
         initialize,
         send,
         schedule,
-        scheduled,
+        notificationsList,
         badgeCount,
         setBadgeCount,
         clearBadge,
         refreshScheduled,
-    } = useNotifications(
-        (notification) => {
-            addTestResult(`✅ Notification reçue: ${ notification.request.content.title }`);
-        },
-        (data) => {
-            addTestResult(`👆 Notification cliquée: ${JSON.stringify(data)}`);
-        }
-    );
+    } = useNotifications(onReceived, onTapped);
 
     const addTestResult = (message : string) => {
         setTestResults((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -39,7 +40,7 @@ export default function NotificationScreen() {
 
     useEffect(() => {
         refreshScheduled();
-    });
+    }, [refreshScheduled]);
 
     const handleInitialize = async () => {
         addTestResult('🔄 Initialisation des notifications ...');
@@ -96,7 +97,7 @@ export default function NotificationScreen() {
                 'Rappel de voyage',
                 'Cette notification apparaîtra dans 30 secondes',
                 date,
-                {testType: 'trip_reminder'}
+              {testType: 'trip_reminder'}
             );
             addTestResult(`✅ Notification Programmée pour ${date.toLocaleTimeString()}`);
             await refreshScheduled();
@@ -231,10 +232,30 @@ export default function NotificationScreen() {
           </View>
         </View>
 
+        {/* Notification History (Real Data) */}
+        {notificationsList.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Historique (Serveur)</Text>
+            <View style={styles.resultsContainer}>
+              {notificationsList.map((notif: any, index: number) => (
+                <View key={notif.id || index} style={styles.resultItem}>
+                  <View style={styles.resultHeader}>
+                    <Text style={[styles.resultText, { fontWeight: 'bold' }]}>{notif.title}</Text>
+                    <Text style={styles.resultDate}>
+                      {new Date(notif.createdAt).toLocaleDateString()}
+                    </Text>
+                  </View>
+                  <Text style={styles.resultText}>{notif.body}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Test Results */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Résultats des tests</Text>
+            <Text style={styles.sectionTitle}>Logs de Test</Text>
             {testResults.length > 0 && (
               <TouchableOpacity onPress={handleClearResults}>
                 <Text style={styles.clearButton}>Effacer</Text>
@@ -242,12 +263,12 @@ export default function NotificationScreen() {
             )}
           </View>
           
-          {testResults.length === 0 ? (
+          {testResults.length === 0 && notificationsList.length === 0 ? (
             <View style={styles.emptyResults}>
               <Ionicons name="document-text-outline" size={48} color="#9ca3af" />
-              <Text style={styles.emptyText}>Aucun résultat pour le moment</Text>
+              <Text style={styles.emptyText}>Aucune notification</Text>
               <Text style={styles.emptySubtext}>
-                Utilisez les boutons ci-dessus pour tester les notifications
+                Utilisez les boutons ci-dessus pour tester ou attendez un message du serveur
               </Text>
             </View>
           ) : (
@@ -442,6 +463,16 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#111827',
         fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    },
+    resultHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    resultDate: {
+        fontSize: 10,
+        color: '#9ca3af',
     },
     emptyResults: {
         backgroundColor: '#fff',
