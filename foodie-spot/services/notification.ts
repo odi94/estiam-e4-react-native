@@ -1,8 +1,36 @@
-import * as Notifications from 'expo-notifications';
+import type * as NotificationsType from 'expo-notifications';
 import * as Device from 'expo-device';
-import Constants from 'expo-constants';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Environment Check
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const isAndroid = Platform.OS === 'android';
+const shouldDisableNotifications = isExpoGo && isAndroid;
+
+// Lazy loaded Notifications module
+let Notifications: typeof NotificationsType | null = null;
+if (!shouldDisableNotifications) {
+    try {
+        Notifications = require('expo-notifications');
+    } catch (e) {
+        console.warn('Failed to load expo-notifications', e);
+    }
+}
+
+// Config - Only if available
+if (Notifications) {
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: true,
+            shouldShowBanner: true,
+            shouldShowList: true,
+        })
+    });
+}
 
 // Types
 export interface PushToken {
@@ -35,23 +63,13 @@ const DEFAULT_PREFS: NotificationPreferences = {
     sound: true,
 };
 
-// Config
-
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-        shouldShowBanner: true,
-        shouldShowList: true,
-    })
-})
-
 // Notifications services
 
 export const notifications = {
 
     async initialize(): Promise<PushToken | null> {
+        if (!Notifications) return null;
+
         const isSimulator = !Device.isDevice;
 
         if (isSimulator) {
@@ -70,7 +88,7 @@ export const notifications = {
             return null;
         }
 
-        if (Platform.OS == 'android') {
+        if (Platform.OS === 'android') {
             await this.createAndroidChannels();
         }
 
@@ -108,6 +126,7 @@ export const notifications = {
          }
     },
     async createAndroidChannels(): Promise<void> {
+        if (!Notifications) return;
         await Notifications.setNotificationChannelAsync('default', {
             name: 'Default',
             importance: Notifications.AndroidImportance.MAX,
@@ -124,15 +143,17 @@ export const notifications = {
         return stored ? JSON.parse(stored) : null;
     },
     async send(title: string, body: string, data?: Record<string, any>): Promise<string>{
+        if (!Notifications) return '';
         return Notifications.scheduleNotificationAsync({
             content: { title, body, data: data || {}, sound: 'default'},
             trigger: null,
         })
     },
     async schedule(title: string, body: string, date: Date, data?: Record<string, any>): Promise<string> {
+        if (!Notifications) return '';
          return Notifications.scheduleNotificationAsync({
             content: { title, body, data: data || {}, sound: 'default'},
-            trigger: {type: Notifications.SchedulableTriggerInputTypes.DATE, date},
+            trigger: {type: Notifications.SchedulableTriggerInputTypes.DATE, date} as any,
         })
     },
 
@@ -155,23 +176,29 @@ export const notifications = {
     },
 
     async cancel(id: string): Promise<void> {
+        if (!Notifications) return;
         await Notifications.cancelScheduledNotificationAsync(id);
     },
 
       async cancelAll(): Promise<void> {
+        if (!Notifications) return;
         await Notifications.cancelAllScheduledNotificationsAsync();
     },
 
-      async getScheduled(): Promise<Notifications.NotificationRequest[]> {
+      async getScheduled(): Promise<any[]> {
+        if (!Notifications) return [];
        return  Notifications.getAllScheduledNotificationsAsync();
     },
       async setBadge(count: number): Promise<void> {
+        if (!Notifications) return;
         await Notifications.setBadgeCountAsync(count);
     },
        async getBadge(): Promise<number> {
+        if (!Notifications) return 0;
         return Notifications.getBadgeCountAsync();
     },
        async clearBadge(): Promise<void> {
+        if (!Notifications) return;
         await Notifications.setBadgeCountAsync(0);
     },
        async getPreferences(): Promise<NotificationPreferences> {
@@ -183,9 +210,11 @@ export const notifications = {
     },
     
     setupListeners(
-        onReceived?: (notification: Notifications.Notification) => void,
-        onTapped?: (response: Notifications.NotificationResponse) => void
+        onReceived?: (notification: any) => void,
+        onTapped?: (response: any) => void
     ): () => void {
+        if (!Notifications) return () => {};
+
         const receivedSub = Notifications.addNotificationReceivedListener((n) => {
             console.log('Notification received:', n);
             onReceived?.(n);
@@ -200,5 +229,9 @@ export const notifications = {
             receivedSub.remove();
             responseSub.remove();
         }
+    },
+    async getLastResponse(): Promise<any> {
+        if (!Notifications) return null;
+        return Notifications.getLastNotificationResponseAsync();
     }
 }
