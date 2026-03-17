@@ -1,45 +1,59 @@
+import React from 'react';
 import { Order } from "@/types";
-import { Check, CheckCircle, ChefHat, Clock, Navigation, X } from "lucide-react-native";
+import { Check, CheckCircle, ChefHat, Clock, X, Package, Truck, Utensils } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "@/contexts/theme-context";
 
 interface Props {
     order: Order;
     onPress?: () => void;
 }
 
-const statusColor: Record<Order['status'],string> = {
+const statusColor: Record<Order['status'], string> = {
     'pending': '#9CA3AF',
-    'preparing': '#F59E0B',
-    'delivered': '#4CAF50',
-    'cancelled': '#F44336', 
     'confirmed': '#2196F3',
-    'on-the-way': '#8B5CF6',
+    'preparing': '#F59E0B',
+    'ready': '#F59E0B',
+    'picked_up': '#8B5CF6',
+    'delivering': '#8B5CF6',
+    'delivered': '#4CAF50',
+    'cancelled': '#F44336',
 };
+
 const statusIcon: Record<Order['status'], React.ReactNode> = {
-    'pending': <Clock size={16} color="#9CA3AF" />,
-    'preparing': <ChefHat size={16} color="#F59E0B" />,
-    'delivered': <Check size={16} color="#4CAF50" />,
-    'cancelled': <X size={16} color="#F44336" />, 
-    'confirmed': <CheckCircle size={16} color="#2196F3" />,
-    'on-the-way': <Navigation size={16} color="#8B5CF6" />,
+    'pending': <Clock size={16} />,
+    'confirmed': <CheckCircle size={16} />,
+    'preparing': <ChefHat size={16} />,
+    'ready': <Utensils size={16} />,
+    'picked_up': <Package size={16} />,
+    'delivering': <Truck size={16} />,
+    'delivered': <Check size={16} />,
+    'cancelled': <X size={16} />,
 };
 
 
 export const OrderCard: React.FC<Props> = ({ order, onPress }) => {
+    const { colors } = useTheme();
     return (
-        <TouchableOpacity style={styles.card} onPress={onPress} disabled={!onPress}>
+        <TouchableOpacity 
+            style={[styles.card, { backgroundColor: colors.card }]} 
+            onPress={onPress} 
+            disabled={!onPress}
+        >
                 <View style={styles.header}>
-                        <Text style={styles.restaurant}>{order.restaurantName}</Text>
-                        <View style={[styles.status, { backgroundColor: statusColor[order.status] }]}>
-                            {statusIcon[order.status]}
-                            <Text style={styles.statusText}>{order.status.toUpperCase()}</Text>
+                        <Text style={[styles.restaurant, { color: colors.text }]}>{order.restaurantName}</Text>
+                        <View style={[styles.status, { backgroundColor: statusColor[order.status] + '20' }]}>
+                            {React.cloneElement(statusIcon[order.status] as any, { color: statusColor[order.status] })}
+                            <Text style={[styles.statusText, { color: statusColor[order.status] }]}>{order.status.toUpperCase()}</Text>
                         </View>
                 </View>
 
-                <Text style={styles.items} numberOfLines={1}>{order.items.map(item => item.dish.name).join(', ')}</Text>
+                <Text style={[styles.items, { color: colors.gray }]} numberOfLines={1}>
+                    {order.items?.map(item => item.dish?.name || item.name || 'Article inconnu').join(', ')}
+                </Text>
                 <View style={styles.footer}>
-                    <Text style={styles.total}>Total: {order.total} €</Text>
-                    <Text style= {styles.date}>{new Date(order.createdAt).toLocaleDateString()}</Text>
+                    <Text style={[styles.total, { color: colors.tint }]}>Total: {order.total} €</Text>
+                    <Text style= {[styles.date, { color: colors.gray }]}>{new Date(order.createdAt).toLocaleDateString()}</Text>
                 </View>
         </TouchableOpacity>
     );
@@ -48,7 +62,6 @@ export const OrderCard: React.FC<Props> = ({ order, onPress }) => {
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#fff',
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
