@@ -1,34 +1,52 @@
 export interface Restaurant {
     id: string;
     name: string;
-    cuisine: string;
     description: string;
     image: string;
+    coverImage?: string;
+    cuisine: string[]; 
+    priceRange?: string;
     rating: number;
-    reviewsCount: number;
-    deliveryTime: number;
-    distance: number;
-    priceRange: string;
+    reviewCount: number; 
+    deliveryTime: { min: number; max: number } | number; 
+    deliveryFee: number;
+    minimumOrder?: number;
     address: string;
+    latitude: number;
+    longitude: number;
     phone: string;
-    coordinates: {
-        latitude: number;
-        longitude: number;
+    isOpen?: boolean;
+    isFavorite?: boolean;
+    distance?: number;
+    reviews?: Review[];
+}
+
+export interface Review {
+    id: string;
+    userName: string;
+    userImage?: string;
+    rating: number;
+    ratings?: {
+        food: number;
+        delivery: number;
+        service: number;
     };
-    isOpen: boolean;
-    isFavorite: boolean;
+    comment: string;
+    images?: string[];
+    date: string;
 }
 
 export interface SearchFilters {
     cuisine?: string;
-    priceRange?: string;
+    priceRange?: number;
     rating?: number;
     deliveryTime?: number;
     isOpen?: boolean;
 }
+
 export interface Dish {
     id: string;
-    resurantId: string;
+    restaurantId: string;
     name: string;
     description: string;
     price: number;
@@ -38,22 +56,21 @@ export interface Dish {
     isAvailable: boolean;
 }
 
-
 export interface CartItem {
-    dish: Dish;
+    menuItemId: string; 
     quantity: number;
-    options?: string[];
-    specialInstructions?: string;
+    dish: Dish; 
 }
 
 export interface User {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    phone: string;
-    photo?: string;
-    addresses: Address[];
-    favoriteRestaurants: string[];
+    phone?: string;
+    avatar?: string;
+    addresses?: Address[];
+    favoriteRestaurants?: string[];
 }
 
 export interface Address {
@@ -62,62 +79,74 @@ export interface Address {
     street: string;
     city: string;
     postalCode: string;
-    country: string;
-    coordinates: {
-        latitude: number;
-        longitude: number;
-    };
+    latitude: number;
+    longitude: number;
 }
+
 export interface Order {
     id: string;
+    orderNumber: string;
     restaurantId: string;
     restaurantName: string;
-    items: CartItem[];
+    items: any[]; 
     total: number;
+    subtotal: number;
     deliveryFee: number;
-    status: 'pending' | 'confirmed' | 'preparing' | 'on-the-way' | 'delivered' | 'cancelled';
-    createdAt: Date;
-    estimatedDeliveryTime?: Date;
-    deliveryAddress: string;
-    driverInfo?:{
+    serviceFee: number;
+    status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'picked_up' | 'delivering' | 'delivered' | 'cancelled';
+    createdAt: string;
+    estimatedDelivery?: string;
+    deliveryAddress: string | any;
+    driver?: {
         name: string;
         phone: string;
         photo?: string;
-        location?: {
+        vehicle?: string;
+        rating?: number;
+    };
+    timeline: { status: string; timestamp: string; message: string }[];
+}
+
+export interface TrackingData {
+    orderId: string;
+    orderNumber: string;
+    status: string;
+    timeline: any[];
+    estimatedDelivery: string;
+    estimatedArrival?: string;
+    estimatedMinutes?: number;
+    restaurant: {
+        id: string;
+        name: string;
+        image: string;
+        phone: string;
+        location: {
             latitude: number;
             longitude: number;
+            address: string;
         };
+    } | null;
+    deliveryAddress: any;
+    driver?: {
+        id: string;
+        name: string;
+        phone: string;
+        photo: string;
+        vehicle: string;
+        rating: number;
+        totalDeliveries?: number;
     };
-}
-
-export interface ToastMessage {
-    id: string;
-    message: string;
-    type: ToastType;
-    duration?: number;
-}
-
-export interface ToastOptions {
-    type?: ToastType;
-    duration?: number;
-}
-
-export type ToastType = 'success' | 'error' | 'info';
-
-export interface ToastContextType { 
-    show: (message: string,  type?: ToastType, duration?: number) => void;
-    success: (message: string,  duration?: number) => void;
-    error: (message: string,  duration?: number) => void;
-    info: (message: string, duration?: number) => void;
-    warning: (message: string,  duration?: number) =>  void;
-}
-
-
-export interface ToastStackProps {
-    toasts: ToastMessage[];
-}
-
-export interface ToastItemProps {
-    toast: ToastMessage;
-    index: number;
+    driverLocation?: {
+        latitude: number;
+        longitude: number;
+        heading: number;
+        speed: number;
+        updatedAt: string;
+    };
+    steps: {
+        key: string;
+        label: string;
+        completed: boolean;
+        time?: string;
+    }[];
 }
