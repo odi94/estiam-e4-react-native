@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavigationProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,41 +11,52 @@ import { Ionicons } from '@expo/vector-icons';
 import 'react-native-reanimated';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
+import { CartProvider } from '@/contexts/cart-context';
 import { ToastProvider } from '@/components/toast-provider';
+import { FloatingCartBar } from '@/components/floating-cart-bar';
 import { useOffline } from '@/hooks/use-offline';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
+import { useTheme, ThemeProvider } from '@/contexts/theme-context';
+import { useI18n } from '@/hooks/use-i18n';
+import { I18nProvider } from '@/contexts/i18n-context';
+
 
 export const unstable_settings = {
   initialRouteName: '(tabs)',
 };
 
 function RootLayoutContent() {
-  const colorScheme = useColorScheme();
+  const { theme, colors } = useTheme();
   const { isOnline, pendingCount, isSyncing, syncNow } = useOffline();
-  const { isAuthenticated, isLoading, refreshAuth } = useAuth();
+  const { isAuthenticated, isLoading, refreshAuth, isOnboardingSeen } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const { t } = useI18n();
 
   // Navigation Guard
   useEffect(() => {
     if (isLoading) return;
 
-    const firstSegment = segments[0];
-    const protectedRoutes = ['(tabs)', 'cart', 'checkout', 'restaurant', 'dish', 'tracking', 'review'];
-    const isProtectedRoute = protectedRoutes.some(route => firstSegment === route || firstSegment?.startsWith(route));
-    const isAuthRoute = firstSegment === '(auth)' || firstSegment === 'login' || firstSegment === 'register';
+    const inAuthGroup = segments[0] === '(auth)';
+    const inTabsGroup = segments[0] === '(tabs)';
+    const isOnboarding = segments[0] === 'onboarding';
 
-    console.log('🛡️ [NavigationGuard]', { segment: firstSegment, isAuthenticated, isProtectedRoute, isAuthRoute });
+    console.log('🛡️ [NavigationGuard]', { segments, isAuthenticated, inAuthGroup, inTabsGroup, isOnboarding });
 
-    if (!isAuthenticated && isProtectedRoute) {
-      console.log('🔒 Redirecting to login...');
-      router.replace('/login');
-    } else if (isAuthenticated && isAuthRoute) {
+    if (!segments[0]) return;
+
+    if (!isAuthenticated && !inAuthGroup && !isOnboarding) {
+      if (!isOnboardingSeen) {
+        console.log('📦 Redirecting to onboarding...');
+        setTimeout(() => router.replace('/onboarding'), 0);
+      } else {
+        console.log('🔒 Redirecting to login...');
+        setTimeout(() => router.replace('/(auth)/login'), 0);
+      }
+    } else if (isAuthenticated && (inAuthGroup || isOnboarding)) {
       console.log('✅ Redirecting to home...');
-      router.replace('/(tabs)');
+      setTimeout(() => router.replace('/(tabs)'), 0);
     }
-  }, [segments, isLoading, isAuthenticated, router]);
+  }, [segments, isLoading, isAuthenticated, isOnboardingSeen, router]);
 
   useEffect(() => {
     if (segments[0] === '(tabs)' && !isLoading && !isAuthenticated) {
@@ -55,21 +66,21 @@ function RootLayoutContent() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
         <Text style={styles.loadingLogo}>🍔</Text>
-        <ActivityIndicator size="large" color={Colors.light.tint} />
-        <Text style={styles.loadingText}>Chargement...</Text>
+        <ActivityIndicator size="large" color={colors.tint} />
+        <Text style={[styles.loadingText, { color: colors.gray }]}>{t('common.loading')}</Text>
       </View>
     );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavigationProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
       {!isOnline && (
         <View style={styles.offlineBanner}>
           <Ionicons name="cloud-offline-outline" size={16} color="#fff" />
           <Text style={styles.bannerText}>
-            Hors ligne {pendingCount > 0 && `• ${pendingCount} en attente`}
+            {t('common.offline')} {pendingCount > 0 && `• ${pendingCount} en attente`}
           </Text>
         </View>
       )}
@@ -84,6 +95,7 @@ function RootLayoutContent() {
       )}
 
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="onboarding" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="restaurant/[id]" options={{ animation: 'slide_from_right' }} />
@@ -94,8 +106,10 @@ function RootLayoutContent() {
         <Stack.Screen name="review/[orderId]" options={{ presentation: 'modal' }} />
       </Stack>
 
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      <FloatingCartBar />
+
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+    </NavigationProvider>
   );
 }
 
@@ -112,11 +126,17 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <ToastProvider>
-        <AuthProvider>
-          <RootLayoutContent />
-        </AuthProvider>
-        </ToastProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <RootLayoutContent />
+              </CartProvider>
+            </AuthProvider>
+            </ToastProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
