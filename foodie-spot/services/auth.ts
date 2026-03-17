@@ -149,6 +149,21 @@ class AuthService {
     }
   }
 
+  async getOnboardingSeen(): Promise<boolean> {
+    try {
+      const val = await SecureStore.getItemAsync('onboarding_seen');
+      return val === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  async setOnboardingSeen(seen: boolean): Promise<void> {
+    try {
+      await SecureStore.setItemAsync('onboarding_seen', seen ? 'true' : 'false');
+    } catch {}
+  }
+
   async login(credentials: LoginCredentials): Promise<{ user: User; tokens: AuthTokens }> {
     try {
       log.info('🔐 [Auth] Attempting login for:', credentials.email);
@@ -252,7 +267,7 @@ class AuthService {
 
   async updateProfile(updates: Partial<User>): Promise<User> {
     try {
-      const response = await api.patch('/user/profile', updates);
+      const response = await api.put('/users/profile', updates);
       const user = response.data.data || response.data;
       const currentUser = await this.getStoredUser();
       const updatedUser = { ...currentUser, ...user };
