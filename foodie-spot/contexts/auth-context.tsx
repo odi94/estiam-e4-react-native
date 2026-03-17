@@ -8,6 +8,8 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isOnboardingSeen: boolean;
+  setIsOnboardingSeen: (seen: boolean) => Promise<void>;
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<{ user: User; tokens: AuthTokens }>;
   register: (data: RegisterData) => Promise<{ user: User; tokens: AuthTokens }>;
@@ -23,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isOnboardingSeen, setIsOnboardingSeenState] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const checkAuth = useCallback(async () => {
@@ -40,6 +43,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(false);
       setUser(null);
     } finally {
+      const onboardingSeen = await auth.getOnboardingSeen();
+      setIsOnboardingSeenState(onboardingSeen);
       setIsLoading(false);
     }
   }, []);
@@ -100,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       setIsAuthenticated(false);
       log.info('✅ [AuthContext] Logout completed');
-     router.replace('/login');
+      router.replace('/(auth)/login');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Échec de déconnexion';
       setError(message);
@@ -126,6 +131,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const setIsOnboardingSeen = useCallback(async (seen: boolean) => {
+    await auth.setOnboardingSeen(seen);
+    setIsOnboardingSeenState(seen);
+  }, []);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -136,6 +146,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         isLoading,
         isAuthenticated,
+        isOnboardingSeen,
+        setIsOnboardingSeen,
         error,
         login,
         register,
